@@ -24,7 +24,7 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { Tag } from "@/components/ui/tag"
 import { Textarea } from "@chakra-ui/react"
 import { getPostOnLocalStorage } from "@/logic/localstorage"
-import { postingToBsky, savePost, edit } from "@/logic/post"
+import { postingToBsky, savePost, edit, deletePost } from "@/logic/post"
 import { login } from "@/logic/login"
 
 var PasswordCredential: any
@@ -92,8 +92,8 @@ const Title = () => {
 }
  
 const LOREM_IPSUM = {
-  'last_index': 0,
-  0: {text: "el fascismo no se detiene, avanza, ocupa todo y luego explota solo. los que quedan despu\u00E9s dicen \"yo no sab\u00EDa nada\" y se civilizan un tiempo, hasta que el horror se diluye.\nCarlos Busqued"}
+  'last_index': 1,
+  1: {text: "el fascismo no se detiene, avanza, ocupa todo y luego explota solo. los que quedan despu\u00E9s dicen \"yo no sab\u00EDa nada\" y se civilizan un tiempo, hasta que el horror se diluye.\nCarlos Busqued"}
 };
 
 
@@ -102,6 +102,7 @@ const App = () => {
   let [isDraftPostOpen, setIsDraftPostOpen] = useState<boolean>(false);
   const savedPosts = getPostOnLocalStorage();
   let [posts, setPosts] = useState({...LOREM_IPSUM, ...savedPosts});
+  let [postIndex, setPostIndex] = useState(0);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("")
   let [agent, _setAgent] = useState(new BskyAgent({
@@ -116,7 +117,7 @@ const App = () => {
         if(credentials) {
           setPassword(credentials.password);
           setUser(credentials.name);
-          login(agent, user, password, setIsLoginOpen)
+          login(agent, credentials.name, credentials.password, setIsLoginOpen)
         } else {
           setIsLoginOpen(true);
         }
@@ -133,10 +134,24 @@ const App = () => {
           isDraftPostOpen, setIsDraftPostOpen,
           posts, setPosts,
           draftText, setDraftText,
+          postIndex, setPostIndex,
           agent
         }
       }>
     <Title/>
+    <Button 
+        colorPalette="blue" 
+        variant="subtle" 
+        m={2} 
+        onClick={
+          () => {
+            setPostIndex(0); 
+            setDraftText("");
+             setIsDraftPostOpen(true)
+          }
+        } 
+        size="sm"
+      >Neu Draft Post!</Button>
     <Stack>
       <RenderSavedPost/>
     </Stack>
@@ -145,17 +160,16 @@ const App = () => {
   )
 }
 
-
-
 const RenderSavedPost = () => {
   const { 
     setIsDraftPostOpen,
     posts, setPosts,
     setDraftText,
+    setPostIndex,
     agent
   } = useContext(Context);
  let renderedPosts = [];
-    
+     console.log("RenderSavedPost posts",posts)
   for(const index in posts) {
     ! isNaN(index) && renderedPosts.push(
     <>
@@ -169,7 +183,20 @@ const RenderSavedPost = () => {
           <Stack direction="row">
           <HStack>
         <Button m={1} variant="outline" onClick={() => postingToBsky(agent, posts, index, setPosts)}> Post</Button>
-        <Button  onClick={() => edit(index, posts, setDraftText, setPosts, setIsDraftPostOpen)} padding="20px" variant="outline">Edit</Button>
+        <Button  
+          onClick={
+            () =>{ 
+              edit(index, posts, setDraftText, setIsDraftPostOpen)
+            }
+          } 
+          padding="20px" variant="outline">Edit</Button>
+        <Button  
+          onClick={
+            () =>{ 
+              deletePost(index, posts, setPosts)
+            }
+          } 
+          padding="20px" variant="outline">Delete</Button>
         </HStack>
         </Stack>
       </Card.Root>
@@ -224,27 +251,43 @@ const DrafPostButton = () => {
         <DialogCloseTrigger />
       </DialogContent>
     </DialogRoot> 
+    <EditPostDialog/>
+    </>
+  )
+}
 
+const EditPostDialog = () => {
+  const { 
+    isLoginOpen, setIsLoginOpen, 
+    isDraftPostOpen, setIsDraftPostOpen,
+    posts, setPosts,
+    draftText, setDraftText,
+    postIndex,
+    agent
+  } = useContext(Context);
 
-
+  let [charactersLeft, setCharactersLeft] = useState((300 - draftText.length));
+  const index = postIndex != 0? postIndex : (posts?.last_index || 1 ) + 1;
+  
+  useEffect(() => {
+    setCharactersLeft(300 - draftText.length);
+  }, [setCharactersLeft]);
+  return (
+    <>
     <DialogRoot open={isDraftPostOpen}>
-      <DialogTrigger asChild>
-        <Button colorPalette="blue" variant="subtle" m={2} onClick={() => setIsDraftPostOpen(true)} size="sm">
-        Neu Draft Post!
-        </Button>
-      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Draf Post</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <Textarea
+              value={draftText}
               colorPalette={charactersLeft >= 0 ? "black" : "red"}
               autoresize 
               onChange={
                 (e) => {
                   setDraftText(e.target.value); 
-                  setCharactersLeft(300 - e.target.value.length);
+                  setCharactersLeft(300 - draftText.length);
                 }
               }
               placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
@@ -258,7 +301,7 @@ const DrafPostButton = () => {
               </Tag>
               <Stack m={1}  direction="row" > 
                 <Button 
-                  onClick={() => savePost(posts, draftText, setPosts, setIsDraftPostOpen)} 
+                  onClick={() => savePost(posts, index, draftText, setPosts, setIsDraftPostOpen)} 
                   variant="outline">Save
                 </Button>
                 {/*<Button onClick={() => postingToBsky(agent, posts, null, setPosts)} variant="outline"> Post </Button>*/}
@@ -281,6 +324,5 @@ const DrafPostButton = () => {
     </>
   )
 }
-
 
 export default App

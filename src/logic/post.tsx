@@ -2,28 +2,36 @@
 // @ts-nocheck
 import { savePostOnLocalStorage } from "@/logic/localstorage"
 
-export const postingToBsky = async (agent, posts, key, setPosts) => {
-  key = Number(key)
+export const postingToBsky = async (agent, posts, index, setPosts) => {
+  index = Number(index)
   await agent.post({
-    text: posts[key]?.text,
+    text: posts[index]?.text,
     createdAt: new Date().toISOString()
   })
   
-  delete posts[key];
+  delete posts[index];
+  setPosts({ ...posts}); 
+  savePostOnLocalStorage(posts);
+}
+
+export const deletePost = (index, posts, setPosts) => {
+  delete posts[index];
   setPosts({ ...posts}); 
   savePostOnLocalStorage(posts);
 }
 
 export const edit = (index, posts, setDraftText, setIsDraftPostOpen) => {
+  console.log("edit posts[index]?.text ",posts[index]?.text)
     setDraftText(posts[index]?.text);
     setIsDraftPostOpen(true)
   }
 
-export const savePost = async (posts, draftText, setPosts, setIsDraftPostOpen) => {
-  const next_index = (posts?.last_index || 0 ) + 1;
-  posts[next_index] = {text: draftText};
-  posts.last_index = next_index;
-  
+export const savePost = async (posts, index, draftText, setPosts, setIsDraftPostOpen) => {
+  console.log("savePost >> posts",posts)
+  posts.last_index = (index > posts.last_index) ? index : posts.last_index;
+  posts[index] = {text: draftText};
+
+  console.log("savePost posts >>>>>>>>>>>",posts)
   setPosts(posts); 
   savePostOnLocalStorage(posts);
   setIsDraftPostOpen(false)
