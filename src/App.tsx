@@ -24,7 +24,8 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { Tag } from "@/components/ui/tag"
 import { Textarea } from "@chakra-ui/react"
 import { getPostOnLocalStorage } from "@/logic/localstorage"
-import { postingToBsky, savePost, login, edit } from "@/logic/post"
+import { postingToBsky, savePost, edit } from "@/logic/post"
+import { login } from "@/logic/login"
 
 var PasswordCredential: any
 declare global {
@@ -119,6 +120,7 @@ const App = () => {
           console.log(credentials)
           setPassword(credentials.password);
           setUser(credentials.name);
+          login(agent, user, password, setIsLoginOpen)
         } else {
           console.log("getCredentials")
           setIsLoginOpen(true);
@@ -219,7 +221,7 @@ const DrafPostButton = () => {
    
       </DialogBody>
         <DialogFooter>
-          <Button onClick={() =>  login(agent, user, password, setIsLoginOpen)} variant="outline">Login</Button>
+          <Button onClick={() => login(agent, user, password, setIsLoginOpen)} variant="outline">Login</Button>
           <DialogActionTrigger asChild>
             <Button onClick={() => setIsLoginOpen(false)} variant="outline">Cancel</Button>
           </DialogActionTrigger>
