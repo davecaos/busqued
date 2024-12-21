@@ -44,12 +44,12 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
 
   await navigator.credentials.store(credential);
 
-  
+  console.log("agent",agent)
   let _login = (await agent.login({
     identifier: user,
     password: password
   }));
 
-  console.log(_login)
+  console.log("login",_login)
   setIsLoginOpen(false);
 }
