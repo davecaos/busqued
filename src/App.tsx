@@ -104,8 +104,8 @@ const App = () => {
   console.log(savedPosts)
   let [posts, setPosts] = useState({...LOREM_IPSUM, ...savedPosts});
   console.log(posts)
-  const [_user, setUser] = useState("");
-  const [_password, setPassword] = useState("")
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("")
   let [agent, _setAgent] = useState(new BskyAgent({
     service: 'https://bsky.social'
   }));
