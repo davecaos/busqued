@@ -20,10 +20,7 @@ export const edit = (index, posts, setDraftText, setIsDraftPostOpen) => {
   }
 
 export const savePost = async (posts, draftText, setPosts, setIsDraftPostOpen) => {
-  console.log("savePost IN")
-  console.log(posts)
   const next_index = (posts?.last_index || 0 ) + 1;
-  console.log("next_index :",next_index)
   posts[next_index] = {text: draftText};
   posts.last_index = next_index;
   
@@ -33,8 +30,6 @@ export const savePost = async (posts, draftText, setPosts, setIsDraftPostOpen) =
 }
 
 export const login = async (agent, user, password, setIsLoginOpen) => {
-  console.log(user,password)
-  
   var credential:any = new PasswordCredential({
     id: user,
     password: password,
@@ -44,12 +39,10 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
 
   await navigator.credentials.store(credential);
 
-  console.log("agent",agent)
   let _login = (await agent.login({
     identifier: user,
     password: password
   }));
 
-  console.log("login",_login)
   setIsLoginOpen(false);
 }

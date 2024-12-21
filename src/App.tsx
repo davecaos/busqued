@@ -101,9 +101,7 @@ const App = () => {
   let [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
   let [isDraftPostOpen, setIsDraftPostOpen] = useState<boolean>(false);
   const savedPosts = getPostOnLocalStorage();
-  console.log(savedPosts)
   let [posts, setPosts] = useState({...LOREM_IPSUM, ...savedPosts});
-  console.log(posts)
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("")
   let [agent, _setAgent] = useState(new BskyAgent({
@@ -116,13 +114,10 @@ const App = () => {
       if ("credentials" in navigator) {
         const credentials = await navigator.credentials.get({ password: true })
         if(credentials) {
-          console.log("credentials>>")
-          console.log(credentials)
           setPassword(credentials.password);
           setUser(credentials.name);
           login(agent, user, password, setIsLoginOpen)
         } else {
-          console.log("getCredentials")
           setIsLoginOpen(true);
         }
       }
