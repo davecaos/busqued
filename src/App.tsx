@@ -84,7 +84,7 @@ declare global {
 const Title = () => {
   return (
     <Stack align="flex-start">
-      <Heading size="2xl">  Busqued (Drafts for Himmelblau🦋)</Heading>
+      <Heading size="2xl">Busqued (Drafts for Himmelblau🦋)</Heading>
       <DrafPostButton/>
     </Stack>
   )
@@ -92,7 +92,7 @@ const Title = () => {
  
 const LOREM_IPSUM = {
   'last_index': 0,
-  0: {text: "el fascismo no se detiene, avanza, ocupa todo y luego explota solo. los que quedan despu\u00E9s dicen \"yo no sab\u00EDa nada\" y se civilizan un tiempo, hasta que el horror se diluye.\n Carlos Busqued"}
+  0: {text: "el fascismo no se detiene, avanza, ocupa todo y luego explota solo. los que quedan despu\u00E9s dicen \"yo no sab\u00EDa nada\" y se civilizan un tiempo, hasta que el horror se diluye.\nCarlos Busqued"}
 };
 
 
@@ -208,7 +208,7 @@ const DrafPostButton = () => {
           <Input m={1} 
             value={user}
             onChange={(e) => setUser(e.target.value)} 
-            placeholder="davecaos.bsky.social"
+            placeholder="tuvieja.bsky.social"
             />
           <PasswordInput
             placeholder="Password"
