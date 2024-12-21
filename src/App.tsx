@@ -85,7 +85,7 @@ declare global {
 const Title = () => {
   return (
     <Stack align="flex-start">
-      <Heading size="2xl">Busqued (Drafts for Himmelblau🦋)</Heading>
+      <Heading size="xl">Busqued (Drafts for Himmelblau🦋)</Heading>
       <DrafPostButton/>
     </Stack>
   )
