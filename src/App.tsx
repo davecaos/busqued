@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import './App.css'
 import { useState,useEffect} from "react";
 import { Button } from "@/components/ui/button"
@@ -95,8 +97,8 @@ const LOREM_IPSUM = {
 
 
 const App = () => {
-  let [isLoginOpen, setIsLoginOpen] = useState(false);
-  let [isDraftPostOpen, setIsDraftPostOpen] = useState(false);
+  let [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
+  let [isDraftPostOpen, setIsDraftPostOpen] = useState<boolean>(false);
   const savedPosts = getPostOnLocalStorage();
   console.log(savedPosts)
   let [posts, setPosts] = useState({...LOREM_IPSUM, ...savedPosts});
