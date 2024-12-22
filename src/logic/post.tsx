@@ -20,18 +20,16 @@ export const deletePost = (index, posts, setPosts) => {
   savePostOnLocalStorage(posts);
 }
 
-export const edit = (index, posts, setDraftText, setIsDraftPostOpen) => {
-  console.log("edit posts[index]?.text ",posts[index]?.text)
+export const edit = (index, posts, setPostIndex, setDraftText, setIsDraftPostOpen) => {
     setDraftText(posts[index]?.text);
+    setPostIndex(index);
     setIsDraftPostOpen(true)
   }
 
 export const savePost = async (posts, index, draftText, setPosts, setIsDraftPostOpen) => {
-  console.log("savePost >> posts",posts)
   posts.last_index = (index > posts.last_index) ? index : posts.last_index;
   posts[index] = {text: draftText};
 
-  console.log("savePost posts >>>>>>>>>>>",posts)
   setPosts(posts); 
   savePostOnLocalStorage(posts);
   setIsDraftPostOpen(false)

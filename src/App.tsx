@@ -168,8 +168,8 @@ const RenderSavedPost = () => {
     setPostIndex,
     agent
   } = useContext(Context);
- let renderedPosts = [];
-     console.log("RenderSavedPost posts",posts)
+
+  let renderedPosts = [];
   for(const index in posts) {
     ! isNaN(index) && renderedPosts.push(
     <>
@@ -186,7 +186,7 @@ const RenderSavedPost = () => {
         <Button  
           onClick={
             () =>{ 
-              edit(index, posts, setDraftText, setIsDraftPostOpen)
+              edit(index, posts, setPostIndex, setDraftText, setIsDraftPostOpen)
             }
           } 
           padding="20px" variant="outline">Edit</Button>
@@ -268,7 +268,7 @@ const EditPostDialog = () => {
 
   let [charactersLeft, setCharactersLeft] = useState((300 - draftText.length));
   const index = postIndex != 0? postIndex : (posts?.last_index || 1 ) + 1;
-  
+
   useEffect(() => {
     setCharactersLeft(300 - draftText.length);
   }, [setCharactersLeft]);
