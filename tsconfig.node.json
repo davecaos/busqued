@@ -5,9 +5,7 @@
     "lib": ["ES2023"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": [
-      "@types/webappsec-credential-management"
-    ],
+    "types": ["@types/webappsec-credential-management"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

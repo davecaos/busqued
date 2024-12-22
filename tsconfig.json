@@ -2,11 +2,9 @@
   "files": [],
   "compilerOptions": {
     /* Strict Type-Checking Options */
-    "strict": false,                   
-    "noImplicitAny": false,                     
-    "types": [
-      "@types/webappsec-credential-management"
-    ]
+    "strict": false,
+    "noImplicitAny": false,
+    "types": ["@types/webappsec-credential-management"]
   },
   "references": [
     { "path": "./tsconfig.app.json" },
