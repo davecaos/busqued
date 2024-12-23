@@ -55,6 +55,7 @@ export const EditPostModal = () => {
           </DialogHeader>
           <DialogBody>
             <Textarea
+              textStyle="md"
               value={draftText}
               colorPalette={charactersLeft >= 0 ? "black" : "red"}
               autoresize
