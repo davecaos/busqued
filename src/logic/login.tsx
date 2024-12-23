@@ -10,14 +10,11 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
   });*/
 
 //await navigator.credentials.store(credential);
- console.log("login", agent)
- console.log("login",user)
- console.log("login", password)
+
   let _login = await agent.login({
     identifier: user,
     password: password,
   });
-  console("_login", _login)
   setIsLoginOpen(false);
 };
 
@@ -30,13 +27,10 @@ export const loginWithoutsavedCredentials = async (agent, user, password, setIsL
   });
 
 await navigator.credentials.store(credential);
- console.log("login", agent)
- console.log("login",user)
- console.log("login", password)
   let _login = await agent.login({
     identifier: user,
     password: password,
   });
-  console("_login", _login)
+
   setIsLoginOpen(false);
 };
