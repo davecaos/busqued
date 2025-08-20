@@ -23,29 +23,26 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Tag } from "@/components/ui/tag";
 import { Textarea } from "@chakra-ui/react";
 import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { postingToBsky, savePost, edit, deletePost } from "@/logic/post";
+import { savePost } from "@/logic/post";
 
+const MAX_POST_TEXT_LENGTH = 300;
 
-export const EditPostModal = () => {
-  const {
-    isLoginOpen,
-    setIsLoginOpen,
+export const EditPostModal = ({
     isDraftPostOpen,
     setIsDraftPostOpen,
     posts,
     setPosts,
-    draftText,
-    setDraftText,
     postIndex,
-    agent,
-  } = useContext(Context);
+  }) => {
 
-  let [charactersLeft, setCharactersLeft] = useState(300 - draftText.length);
   const index = postIndex != 0 ? postIndex : (posts?.last_index || 1) + 1;
+  const [postText, setPostText] = useState(posts[index]?.text ?? "");
+  let [charactersLeft, setCharactersLeft] = useState(MAX_POST_TEXT_LENGTH - posts[index]?.text.length);
 
   useEffect(() => {
-    setCharactersLeft(300 - draftText.length);
+    setCharactersLeft(MAX_POST_TEXT_LENGTH - postText.length);
   }, [setCharactersLeft]);
+
   return (
     <>
       <DialogRoot open={isDraftPostOpen}>
@@ -56,12 +53,12 @@ export const EditPostModal = () => {
           <DialogBody>
             <Textarea
               textStyle="md"
-              value={draftText}
+              value={postText}
               colorPalette={charactersLeft >= 0 ? "black" : "red"}
               autoresize
               onChange={(e) => {
-                setDraftText(e.target.value);
-                setCharactersLeft(300 - draftText.length);
+                setPostText(e.target.value);
+                setCharactersLeft(MAX_POST_TEXT_LENGTH - postText.length);
               }}
               placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
             />
@@ -77,26 +74,27 @@ export const EditPostModal = () => {
                 </Tag>
                 <Stack m={1} direction="row">
                   <Button
-                    onClick={() =>
+                    onClick={() =>{
                       savePost(
-                        posts,
-                        index,
-                        draftText,
-                        setPosts,
-                        setIsDraftPostOpen,
-                      )
+                          posts,
+                          index,
+                          postText,
+                          setPosts,
+                          setIsDraftPostOpen,
+                        );
+                        setIsDraftPostOpen(false);
+                      }
                     }
                     variant="outline"
                   >
                     Save
                   </Button>
-                  {/*<Button onClick={() => postingToBsky(agent, posts, null, setPosts)} variant="outline"> Post </Button>*/}
                 </Stack>
                 <DialogActionTrigger asChild>
                   <Button
                     onClick={() => {
+                      setCharactersLeft(MAX_POST_TEXT_LENGTH);
                       setIsDraftPostOpen(false);
-                      setCharactersLeft(300);
                     }}
                     variant="outline"
                   >

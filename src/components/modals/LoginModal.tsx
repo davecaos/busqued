@@ -23,21 +23,14 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Tag } from "@/components/ui/tag";
 import { Textarea } from "@chakra-ui/react";
 import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { postingToBsky, savePost, edit, deletePost } from "@/logic/post";
 import { loginWithoutsavedCredentials} from "@/logic/login";
 
-export const LoginModal = () => {
-  const {
+export const LoginModal = ({
     isLoginOpen,
     setIsLoginOpen,
-    isDraftPostOpen,
-    setIsDraftPostOpen,
-    posts,
-    setPosts,
-    draftText,
-    setDraftText,
     agent,
-  } = useContext(Context);
+  }) => {
+
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
@@ -67,7 +60,10 @@ export const LoginModal = () => {
           </DialogBody>
           <DialogFooter>
             <Button
-              onClick={() => loginWithoutsavedCredentials(agent, user, password, setIsLoginOpen)}
+              onClick={() => {
+                loginWithoutsavedCredentials(agent, user, password);
+                setIsLoginOpen(false);
+              }}
               variant="outline"
             >
               Login

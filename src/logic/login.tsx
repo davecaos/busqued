@@ -2,15 +2,6 @@
 // @ts-nocheck
 
 export const login = async (agent, user, password, setIsLoginOpen) => {
- /* var credential: any = new PasswordCredential({
-    id: user,
-    password: password,
-    name: user,
-    iconURL: "https://bsky.app/profile/" + user,
-  });*/
-
-//await navigator.credentials.store(credential);
-
   let _login = await agent.login({
     identifier: user,
     password: password,
@@ -18,7 +9,8 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
   setIsLoginOpen(false);
 };
 
-export const loginWithoutsavedCredentials = async (agent, user, password, setIsLoginOpen) => {
+export const loginWithoutsavedCredentials = async (agent, user, password) => {
+  console.log("loginWithoutsavedCredentials", user, password)
   var credential: any = new PasswordCredential({
     id: user,
     password: password,
@@ -31,6 +23,4 @@ await navigator.credentials.store(credential);
     identifier: user,
     password: password,
   });
-
-  setIsLoginOpen(false);
 };

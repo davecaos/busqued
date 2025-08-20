@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, Heading, Stack, HStack, VStack } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { BskyAgent } from "@atproto/api";
+import  Posts  from "@/components/Posts";
 import {
   DialogActionTrigger,
   DialogBody,
@@ -17,27 +18,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Context } from "./Context";
-import { useContext } from "react";
 
 import { PasswordInput } from "@/components/ui/password-input";
 import { Tag } from "@/components/ui/tag";
 import { Textarea } from "@chakra-ui/react";
 import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { postingToBsky, savePost, edit, deletePost } from "@/logic/post";
 import { login } from "@/logic/login";
 import { LoginModal } from "@/components/modals/LoginModal";
 import { EditPostModal} from "@/components/modals/EditPostModal";
-
-const Title = () => {
-  return (
-    <Stack align="flex-start">
-      <Heading size="xl">Busqued (Drafts for Himmelblau🦋)</Heading>
-      <LoginModal/>
-      <EditPostModal/>
-    </Stack>
-  );
-};
+import { Header } from "@/components/header/Header"
+import  UseStateReducer  from "@/hooks/UseStateReducer";
 
 const LOREM_IPSUM = {
   last_index: 1,
@@ -47,30 +37,30 @@ const LOREM_IPSUM = {
 };
 
 const App = () => {
-  let [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
-  let [isDraftPostOpen, setIsDraftPostOpen] = useState<boolean>(false);
   const savedPosts = getPostOnLocalStorage();
-  let [posts, setPosts] = useState({ ...LOREM_IPSUM, ...savedPosts });
-  let [postIndex, setPostIndex] = useState(0);
-  const [user, setUser] = useState("");
-  const [password, setPassword] = useState("");
-  let [agent, _setAgent] = useState(
-    new BskyAgent({
-      service: "https://bsky.social",
-    }),
-  );
-  let [draftText, setDraftText] = useState("");
+  const initialPosts = { ...LOREM_IPSUM, ...savedPosts };
+
+  let [postsState, setPostsState] = UseStateReducer({
+        isLoginOpen: false,
+        isDraftPostOpen: false,
+        posts: initialPosts,
+        draftText: "",
+        user: "",
+        password: "",
+        postIndex:0,
+        agent: new BskyAgent({service: "https://bsky.social", })
+    });
 
   useEffect(() => {
     async function getCredentials() {
       if ("credentials" in navigator) {
         const credentials = await navigator.credentials.get({ password: true });
         if (credentials) {
-          setPassword(credentials.password);
-          setUser(credentials.name);
-          login(agent, credentials.name, credentials.password, setIsLoginOpen);
+          setPostsState({user:credentials.name});
+          setPostsState({password:credentials.password});
+          await login(postsState.agent, credentials.name, credentials.password, (isLoginOpen) => {setPostsState({isLoginOpen})});
         } else {
-          setIsLoginOpen(true);
+          setPostsState({isLoginOpen:true});
         }
       }
     }
@@ -79,105 +69,31 @@ const App = () => {
 
   return (
     <>
-      <Context.Provider
-        value={{
-          isLoginOpen,
-          setIsLoginOpen,
-          isDraftPostOpen,
-          setIsDraftPostOpen,
-          posts,
-          setPosts,
-          draftText,
-          setDraftText,
-          postIndex,
-          setPostIndex,
-          agent,
-        }}
-      >
-        <Title />
+     <Stack align="flex-start">
+      <Header postsState={postsState} setPostsState ={setPostsState}/>
+     </Stack>
         <Button
           colorPalette="blue"
           variant="subtle"
           borderColor="black"
           m={2}
           onClick={() => {
-            setPostIndex(0);
-            setDraftText("");
-            setIsDraftPostOpen(true);
+            setPostsState({postIndex:0});
+            setPostsState({draftText:""});
+            setPostsState({isDraftPostOpen:true});
           }}
           size="sm"
         >
-          Neu Draft Post!
+          New Draft Post!
         </Button>
         <Stack>
-          <SavedPosts/>
+          <Posts 
+            postsState={postsState}
+            setPostsState={setPostsState} 
+          />
         </Stack>
-      </Context.Provider>
     </>
   );
-};
-
-const SavedPosts = () => {
-  const {
-    setIsDraftPostOpen,
-    posts,
-    setPosts,
-    setDraftText,
-    setPostIndex,
-    agent,
-  } = useContext(Context);
-
-  let renderedPosts = [];
-  for (const index in posts) {
-    !isNaN(index) &&
-      renderedPosts.push(
-        <>
-          <Card.Root size="sm">
-            <Card.Header>
-              <Heading size="md"> Saved Post</Heading>
-            </Card.Header>
-            <Card.Body color="fg.muted">{posts[index]?.text}</Card.Body>
-            <Stack direction="row">
-              <HStack>
-                <Button
-                  m={1}
-                  variant="outline"
-                  onClick={() => postingToBsky(agent, posts, index, setPosts)}
-                >
-                  Post
-                </Button>
-                <Button
-                  onClick={() => {
-                    edit(
-                      index,
-                      posts,
-                      setPostIndex,
-                      setDraftText,
-                      setIsDraftPostOpen,
-                    );
-                  }}
-                  padding="20px"
-                  variant="outline"
-                >
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => {
-                    deletePost(index, posts, setPosts);
-                  }}
-                  padding="20px"
-                  variant="outline"
-                >
-                  Delete
-                </Button>
-              </HStack>
-            </Stack>
-          </Card.Root>
-        </>,
-      );
-  }
-
-  return renderedPosts;
 };
 
 export default App;
