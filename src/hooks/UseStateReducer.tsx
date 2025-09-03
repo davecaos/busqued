@@ -7,10 +7,8 @@ function useSetStateReducer<T>(initialState: T): [T, SetState<T>] {
   const [state, setState] = useState<T>(initialState);
 
   const updateState: SetState<T> = (updates) => {
-    setState(prev => {
-      const newState = typeof updates === 'function' 
-        ? updates(prev) 
-        : updates;
+    setState((prev) => {
+      const newState = typeof updates === 'function' ? updates(prev) : updates;
       return { ...prev, ...newState };
     });
   };
@@ -19,4 +17,3 @@ function useSetStateReducer<T>(initialState: T): [T, SetState<T>] {
 }
 
 export default useSetStateReducer;
-

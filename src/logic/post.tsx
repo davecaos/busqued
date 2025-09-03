@@ -1,19 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { savePostOnLocalStorage } from "@/logic/localstorage";
+import { savePostOnLocalStorage } from '@/logic/localstorage';
 
 export const postingToBsky = async (agent, posts, index, setPosts) => {
   index = Number(index);
-  console.log("export const postingToBsky >>>", posts[index]?.text)
- /* await agent.post({
+  await agent.post({
     text: posts[index]?.text,
     createdAt: new Date().toISOString(),
-  });*/
+  });
 
   deleteDraft(index, posts, setPosts);
-  //delete posts[index];
-  //setPosts({ ...posts});
-  //savePostOnLocalStorage(posts);
 };
 
 export const deleteDraft = (index, posts, setPosts) => {
@@ -22,11 +18,7 @@ export const deleteDraft = (index, posts, setPosts) => {
   savePostOnLocalStorage(posts);
 };
 
-export const editDraft = (
-  index,
-  setPostIndex,
-  setIsDraftPostOpen,
-) => {
+export const editDraft = (index, setPostIndex, setIsDraftPostOpen) => {
   setPostIndex(index);
   setIsDraftPostOpen(true);
 };
@@ -36,7 +28,7 @@ export const savePost = async (
   index,
   draftText,
   setPosts,
-  setIsDraftPostOpen,
+  setIsDraftPostOpen
 ) => {
   posts.last_index = index > posts.last_index ? index : posts.last_index;
   posts[index] = { text: draftText };
@@ -51,7 +43,7 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
     id: user,
     password: password,
     name: user,
-    iconURL: "https://bsky.app/profile/" + user,
+    iconURL: 'https://bsky.app/profile/' + user,
   });
 
   await navigator.credentials.store(credential);

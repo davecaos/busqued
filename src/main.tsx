@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { Provider } from "@/components/ui/provider";
-import "./index.css";
-import App from "./App.tsx";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from '@/components/ui/provider';
+import './index.css';
+import App from './App.tsx';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -56,14 +56,14 @@ declare global {
     readonly iconURL: string;
     readonly id: string;
     readonly name: string;
-    readonly type: "password" | "federated";
+    readonly type: 'password' | 'federated';
   }
 }
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider>
       <App />
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 );

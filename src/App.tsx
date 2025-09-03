@@ -1,12 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import "./App.css";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, Heading, Stack, HStack, VStack } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
-import { BskyAgent } from "@atproto/api";
-import  Posts  from "@/components/Posts";
+import './App.css';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
+import { Input } from '@chakra-ui/react';
+import { BskyAgent } from '@atproto/api';
+import Posts from '@/components/Posts';
 import {
   DialogActionTrigger,
   DialogBody,
@@ -17,17 +17,17 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
-import { PasswordInput } from "@/components/ui/password-input";
-import { Tag } from "@/components/ui/tag";
-import { Textarea } from "@chakra-ui/react";
-import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { login } from "@/logic/login";
-import { LoginModal } from "@/components/modals/LoginModal";
-import { EditPostModal} from "@/components/modals/EditPostModal";
-import { Header } from "@/components/header/Header"
-import  UseStateReducer  from "@/hooks/UseStateReducer";
+import { PasswordInput } from '@/components/ui/password-input';
+import { Tag } from '@/components/ui/tag';
+import { Textarea } from '@chakra-ui/react';
+import { getPostOnLocalStorage } from '@/logic/localstorage';
+import { login } from '@/logic/login';
+import { LoginModal } from '@/components/modals/LoginModal';
+import { EditPostModal } from '@/components/modals/EditPostModal';
+import { Header } from '@/components/header/Header';
+import UseStateReducer from '@/hooks/UseStateReducer';
 
 const LOREM_IPSUM = {
   last_index: 1,
@@ -41,26 +41,33 @@ const App = () => {
   const initialPosts = { ...LOREM_IPSUM, ...savedPosts };
 
   let [postsState, setPostsState] = UseStateReducer({
-        isLoginOpen: false,
-        isDraftPostOpen: false,
-        posts: initialPosts,
-        draftText: "",
-        user: "",
-        password: "",
-        postIndex:0,
-        agent: new BskyAgent({service: "https://bsky.social", })
-    });
+    isLoginOpen: false,
+    isDraftPostOpen: false,
+    posts: initialPosts,
+    draftText: '',
+    user: '',
+    password: '',
+    postIndex: 0,
+    agent: new BskyAgent({ service: 'https://bsky.social' }),
+  });
 
   useEffect(() => {
     async function getCredentials() {
-      if ("credentials" in navigator) {
+      if ('credentials' in navigator) {
         const credentials = await navigator.credentials.get({ password: true });
         if (credentials) {
-          setPostsState({user:credentials.name});
-          setPostsState({password:credentials.password});
-          await login(postsState.agent, credentials.name, credentials.password, (isLoginOpen) => {setPostsState({isLoginOpen})});
+          setPostsState({ user: credentials.name });
+          setPostsState({ password: credentials.password });
+          await login(
+            postsState.agent,
+            credentials.name,
+            credentials.password,
+            (isLoginOpen) => {
+              setPostsState({ isLoginOpen });
+            }
+          );
         } else {
-          setPostsState({isLoginOpen:true});
+          setPostsState({ isLoginOpen: true });
         }
       }
     }
@@ -69,29 +76,26 @@ const App = () => {
 
   return (
     <>
-     <Stack align="flex-start">
-      <Header postsState={postsState} setPostsState ={setPostsState}/>
-     </Stack>
-        <Button
-          colorPalette="blue"
-          variant="subtle"
-          borderColor="black"
-          m={2}
-          onClick={() => {
-            setPostsState({postIndex:0});
-            setPostsState({draftText:""});
-            setPostsState({isDraftPostOpen:true});
-          }}
-          size="sm"
-        >
-          New Draft Post!
-        </Button>
-        <Stack>
-          <Posts 
-            postsState={postsState}
-            setPostsState={setPostsState} 
-          />
-        </Stack>
+      <Stack align="flex-start">
+        <Header postsState={postsState} setPostsState={setPostsState} />
+      </Stack>
+      <Button
+        colorPalette="blue"
+        variant="subtle"
+        borderColor="black"
+        m={2}
+        onClick={() => {
+          setPostsState({ postIndex: 0 });
+          setPostsState({ draftText: '' });
+          setPostsState({ isDraftPostOpen: true });
+        }}
+        size="sm"
+      >
+        New Draft Post!
+      </Button>
+      <Stack>
+        <Posts postsState={postsState} setPostsState={setPostsState} />
+      </Stack>
     </>
   );
 };

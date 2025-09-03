@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, Heading, Stack, HStack, VStack } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
-import { BskyAgent } from "@atproto/api";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
+import { Input } from '@chakra-ui/react';
+import { BskyAgent } from '@atproto/api';
 import {
   DialogActionTrigger,
   DialogBody,
@@ -15,24 +15,19 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Context } from "@/Context";
-import { useContext } from "react";
+} from '@/components/ui/dialog';
+import { Context } from '@/Context';
+import { useContext } from 'react';
 
-import { PasswordInput } from "@/components/ui/password-input";
-import { Tag } from "@/components/ui/tag";
-import { Textarea } from "@chakra-ui/react";
-import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { loginWithoutsavedCredentials} from "@/logic/login";
+import { PasswordInput } from '@/components/ui/password-input';
+import { Tag } from '@/components/ui/tag';
+import { Textarea } from '@chakra-ui/react';
+import { getPostOnLocalStorage } from '@/logic/localstorage';
+import { loginWithoutsavedCredentials } from '@/logic/login';
 
-export const LoginModal = ({
-    isLoginOpen,
-    setIsLoginOpen,
-    agent,
-  }) => {
-
-  const [user, setUser] = useState("");
-  const [password, setPassword] = useState("");
+export const LoginModal = ({ isLoginOpen, setIsLoginOpen, agent }) => {
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
 
   let [charactersLeft, setCharactersLeft] = useState(300);
 
@@ -77,8 +72,6 @@ export const LoginModal = ({
           <DialogCloseTrigger />
         </DialogContent>
       </DialogRoot>
-
     </>
   );
 };
-

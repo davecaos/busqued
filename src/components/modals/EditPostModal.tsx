@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, Heading, Stack, HStack, VStack } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
-import { BskyAgent } from "@atproto/api";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
+import { Input } from '@chakra-ui/react';
+import { BskyAgent } from '@atproto/api';
 import {
   DialogActionTrigger,
   DialogBody,
@@ -15,29 +15,30 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Context } from "@/Context";
-import { useContext } from "react";
+} from '@/components/ui/dialog';
+import { Context } from '@/Context';
+import { useContext } from 'react';
 
-import { PasswordInput } from "@/components/ui/password-input";
-import { Tag } from "@/components/ui/tag";
-import { Textarea } from "@chakra-ui/react";
-import { getPostOnLocalStorage } from "@/logic/localstorage";
-import { savePost } from "@/logic/post";
+import { PasswordInput } from '@/components/ui/password-input';
+import { Tag } from '@/components/ui/tag';
+import { Textarea } from '@chakra-ui/react';
+import { getPostOnLocalStorage } from '@/logic/localstorage';
+import { savePost } from '@/logic/post';
 
 const MAX_POST_TEXT_LENGTH = 300;
 
 export const EditPostModal = ({
-    isDraftPostOpen,
-    setIsDraftPostOpen,
-    posts,
-    setPosts,
-    postIndex,
-  }) => {
-
+  isDraftPostOpen,
+  setIsDraftPostOpen,
+  posts,
+  setPosts,
+  postIndex,
+}) => {
   const index = postIndex != 0 ? postIndex : (posts?.last_index || 1) + 1;
-  const [postText, setPostText] = useState(posts[index]?.text ?? "");
-  let [charactersLeft, setCharactersLeft] = useState(MAX_POST_TEXT_LENGTH - posts[index]?.text.length);
+  const [postText, setPostText] = useState(posts[index]?.text ?? '');
+  let [charactersLeft, setCharactersLeft] = useState(
+    MAX_POST_TEXT_LENGTH - posts[index]?.text.length
+  );
 
   useEffect(() => {
     setCharactersLeft(MAX_POST_TEXT_LENGTH - postText.length);
@@ -54,7 +55,7 @@ export const EditPostModal = ({
             <Textarea
               textStyle="md"
               value={postText}
-              colorPalette={charactersLeft >= 0 ? "black" : "red"}
+              colorPalette={charactersLeft >= 0 ? 'black' : 'red'}
               autoresize
               onChange={(e) => {
                 setPostText(e.target.value);
@@ -68,23 +69,22 @@ export const EditPostModal = ({
               <HStack>
                 <Tag
                   size="sm"
-                  colorPalette={charactersLeft >= 0 ? "green" : "red"}
+                  colorPalette={charactersLeft >= 0 ? 'green' : 'red'}
                 >
                   {charactersLeft}
                 </Tag>
                 <Stack m={1} direction="row">
                   <Button
-                    onClick={() =>{
+                    onClick={() => {
                       savePost(
-                          posts,
-                          index,
-                          postText,
-                          setPosts,
-                          setIsDraftPostOpen,
-                        );
-                        setIsDraftPostOpen(false);
-                      }
-                    }
+                        posts,
+                        index,
+                        postText,
+                        setPosts,
+                        setIsDraftPostOpen
+                      );
+                      setIsDraftPostOpen(false);
+                    }}
                     variant="outline"
                   >
                     Save

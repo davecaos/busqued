@@ -10,15 +10,15 @@ export const login = async (agent, user, password, setIsLoginOpen) => {
 };
 
 export const loginWithoutsavedCredentials = async (agent, user, password) => {
-  console.log("loginWithoutsavedCredentials", user, password)
+  console.log('loginWithoutsavedCredentials', user, password);
   var credential: any = new PasswordCredential({
     id: user,
     password: password,
     name: user,
-    iconURL: "https://bsky.app/profile/" + user,
+    iconURL: 'https://bsky.app/profile/' + user,
   });
 
-await navigator.credentials.store(credential);
+  await navigator.credentials.store(credential);
   let _login = await agent.login({
     identifier: user,
     password: password,
