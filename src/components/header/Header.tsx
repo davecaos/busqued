@@ -12,7 +12,7 @@ export const Header = ({ postsState, setPostsState }) => {
 
   return (
     <>
-      <Heading size="xl">Busqued (Drafts for Bluesky social 🦋)</Heading>
+      <Heading size="xl">Busqued (Drafts app for Bluesky social 🦋)</Heading>
       <LoginModal
         isLoginOpen={postsState.isLoginOpen}
         setIsLoginOpen={setIsLoginOpen}
