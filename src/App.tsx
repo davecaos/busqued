@@ -32,7 +32,7 @@ import UseStateReducer from '@/hooks/UseStateReducer';
 const LOREM_IPSUM = {
   last_index: 1,
   1: {
-    text: 'el fascismo no se detiene, avanza, ocupa todo y luego explota solo. los que quedan después dicen "𝐲𝐨 𝐧𝐨 𝐬𝐚𝐛í𝐚 𝐧𝐚𝐝𝐚" y se civilizan un tiempo, hasta que el horror se diluye.\nCarlos Busqued',
+    text: 'mis palabras sólo pueden ser entendidas desde lo espiritual y me disculpo si ofendí a alguien.',
   },
 };
 
