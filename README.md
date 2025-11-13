@@ -2,7 +2,7 @@
 
 Busqued (Drafts for Bluesky.social 🦋)
 
-![image](https://github.com/user-attachments/assets/ee2a690d-9be3-4790-a54b-2f30005a6c65)
+![image](https://github.com/user-attachments/assets/9c99fbd4-8791-4f79-9d41-bd46e4c085f5)
 
 
 ```
