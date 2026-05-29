@@ -2,27 +2,16 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import { BskyAgent } from '@atproto/api';
+import { HStack, Textarea } from '@chakra-ui/react';
 import {
-  DialogActionTrigger,
   DialogBody,
-  DialogCloseTrigger,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogRoot,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Context } from '@/Context';
-import { useContext } from 'react';
-
-import { PasswordInput } from '@/components/ui/password-input';
 import { Tag } from '@/components/ui/tag';
-import { Textarea } from '@chakra-ui/react';
-import { getPostOnLocalStorage } from '@/logic/localstorage';
 import { savePost } from '@/logic/post';
 
 const MAX_POST_TEXT_LENGTH = 300;
@@ -34,78 +23,77 @@ export const EditPostModal = ({
   setPosts,
   postIndex,
 }) => {
-  const index = postIndex != 0 ? postIndex : (posts?.last_index || 1) + 1;
-  const [postText, setPostText] = useState(posts[index]?.text ?? '');
-  let [charactersLeft, setCharactersLeft] = useState(
-    MAX_POST_TEXT_LENGTH - posts[index]?.text.length
-  );
+  const index =
+    postIndex != 0 ? Number(postIndex) : Number(posts?.last_index || 1) + 1;
+  const [postText, setPostText] = useState('');
+  const charactersLeft = MAX_POST_TEXT_LENGTH - postText.length;
+  const canSave = postText.trim().length > 0 && charactersLeft >= 0;
 
   useEffect(() => {
-    setCharactersLeft(MAX_POST_TEXT_LENGTH - postText.length);
-  }, [setCharactersLeft]);
+    if (isDraftPostOpen) {
+      setPostText(posts[index]?.text ?? '');
+    }
+  }, [index, isDraftPostOpen, posts]);
+
+  const closeModal = () => {
+    setIsDraftPostOpen(false);
+  };
+
+  const handleSave = (event) => {
+    event.preventDefault();
+
+    if (!canSave) {
+      return;
+    }
+
+    savePost(posts, index, postText, setPosts, setIsDraftPostOpen);
+  };
 
   return (
-    <>
-      <DialogRoot open={isDraftPostOpen}>
-        <DialogContent>
+    <DialogRoot
+      open={isDraftPostOpen}
+      onOpenChange={(details) => setIsDraftPostOpen(details.open)}
+    >
+      <DialogContent className="draft-dialog">
+        <form onSubmit={handleSave}>
           <DialogHeader>
-            <DialogTitle>Draf Post</DialogTitle>
+            <DialogTitle>
+              {postIndex != 0 ? 'Edit Draft' : 'New Draft'}
+            </DialogTitle>
           </DialogHeader>
           <DialogBody>
             <Textarea
-              textStyle="md"
-              value={postText}
-              colorPalette={charactersLeft >= 0 ? 'black' : 'red'}
               autoresize
+              maxLength={MAX_POST_TEXT_LENGTH}
               onChange={(e) => {
                 setPostText(e.target.value);
-                setCharactersLeft(MAX_POST_TEXT_LENGTH - postText.length);
               }}
               placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+              rows={6}
+              textStyle="md"
+              value={postText}
             />
           </DialogBody>
-          <DialogFooter>
-            <VStack>
-              <HStack>
-                <Tag
-                  size="sm"
-                  colorPalette={charactersLeft >= 0 ? 'green' : 'red'}
-                >
-                  {charactersLeft}
-                </Tag>
-                <Stack m={1} direction="row">
-                  <Button
-                    onClick={() => {
-                      savePost(
-                        posts,
-                        index,
-                        postText,
-                        setPosts,
-                        setIsDraftPostOpen
-                      );
-                      setIsDraftPostOpen(false);
-                    }}
-                    variant="outline"
-                  >
-                    Save
-                  </Button>
-                </Stack>
-                <DialogActionTrigger asChild>
-                  <Button
-                    onClick={() => {
-                      setCharactersLeft(MAX_POST_TEXT_LENGTH);
-                      setIsDraftPostOpen(false);
-                    }}
-                    variant="outline"
-                  >
-                    Cancel
-                  </Button>
-                </DialogActionTrigger>
-              </HStack>
-            </VStack>
+          <DialogFooter className="dialog-footer draft-dialog__footer">
+            <Tag size="sm" colorPalette={charactersLeft >= 0 ? 'green' : 'red'}>
+              {charactersLeft}
+            </Tag>
+            <HStack className="dialog-actions">
+              <Button
+                colorPalette="blue"
+                disabled={!canSave}
+                type="submit"
+                variant="solid"
+              >
+                Save
+              </Button>
+              <Button onClick={closeModal} type="button" variant="outline">
+                Cancel
+              </Button>
+            </HStack>
           </DialogFooter>
-        </DialogContent>
-      </DialogRoot>
-    </>
+        </form>
+      </DialogContent>
+    </DialogRoot>
   );
 };

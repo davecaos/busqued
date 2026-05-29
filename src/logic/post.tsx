@@ -4,8 +4,14 @@ import { savePostOnLocalStorage } from '@/logic/localstorage';
 
 export const postingToBsky = async (agent, posts, index, setPosts) => {
   index = Number(index);
+  const text = posts[index]?.text?.trim();
+
+  if (!text) {
+    return;
+  }
+
   await agent.post({
-    text: posts[index]?.text,
+    text,
     createdAt: new Date().toISOString(),
   });
 
@@ -13,9 +19,10 @@ export const postingToBsky = async (agent, posts, index, setPosts) => {
 };
 
 export const deleteDraft = (index, posts, setPosts) => {
-  delete posts[index];
-  setPosts({ ...posts });
-  savePostOnLocalStorage(posts);
+  const nextPosts = { ...posts };
+  delete nextPosts[index];
+  setPosts(nextPosts);
+  savePostOnLocalStorage(nextPosts);
 };
 
 export const editDraft = (index, setPostIndex, setIsDraftPostOpen) => {
@@ -30,28 +37,13 @@ export const savePost = async (
   setPosts,
   setIsDraftPostOpen
 ) => {
-  posts.last_index = index > posts.last_index ? index : posts.last_index;
-  posts[index] = { text: draftText };
+  const nextPosts = {
+    ...posts,
+    last_index: Math.max(Number(index), Number(posts.last_index || 0)),
+    [Number(index)]: { text: draftText.trim() },
+  };
 
-  setPosts(posts);
-  savePostOnLocalStorage(posts);
+  setPosts(nextPosts);
+  savePostOnLocalStorage(nextPosts);
   setIsDraftPostOpen(false);
-};
-
-export const login = async (agent, user, password, setIsLoginOpen) => {
-  var credential: any = new PasswordCredential({
-    id: user,
-    password: password,
-    name: user,
-    iconURL: 'https://bsky.app/profile/' + user,
-  });
-
-  await navigator.credentials.store(credential);
-
-  let _login = await agent.login({
-    identifier: user,
-    password: password,
-  });
-
-  setIsLoginOpen(false);
 };

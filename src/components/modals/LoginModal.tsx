@@ -1,12 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import { BskyAgent } from '@atproto/api';
+import { Input, Stack, Text } from '@chakra-ui/react';
 import {
-  DialogActionTrigger,
   DialogBody,
   DialogCloseTrigger,
   DialogContent,
@@ -14,64 +11,105 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Context } from '@/Context';
-import { useContext } from 'react';
-
 import { PasswordInput } from '@/components/ui/password-input';
-import { Tag } from '@/components/ui/tag';
-import { Textarea } from '@chakra-ui/react';
-import { getPostOnLocalStorage } from '@/logic/localstorage';
-import { loginWithoutsavedCredentials } from '@/logic/login';
+import { getLoginErrorMessage, loginWithCredentials } from '@/logic/login';
 
-export const LoginModal = ({ isLoginOpen, setIsLoginOpen, agent }) => {
+export const LoginModal = ({
+  isLoginOpen,
+  setIsLoginOpen,
+  agent,
+  loginError,
+  setLoginError,
+  onLoginSuccess,
+}) => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  let [charactersLeft, setCharactersLeft] = useState(300);
+  const canSubmit = user.trim().length > 0 && password.length > 0;
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    if (!canSubmit || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setLoginError('');
+
+    try {
+      const session = await loginWithCredentials(agent, user.trim(), password);
+      onLoginSuccess(session?.handle || session?.did || user.trim());
+      setPassword('');
+    } catch (error) {
+      setLoginError(getLoginErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <>
-      <DialogRoot open={isLoginOpen}>
-        <DialogContent>
+    <DialogRoot
+      open={isLoginOpen}
+      onOpenChange={(details) => setIsLoginOpen(details.open)}
+    >
+      <DialogContent className="login-dialog">
+        <form onSubmit={handleLogin}>
           <DialogHeader>
-            <DialogTitle>User & Password</DialogTitle>
+            <DialogTitle>Log in to Bluesky</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <VStack>
+            <Stack gap="3">
+              <label className="form-label" htmlFor="bsky-handle">
+                Bluesky handle
+              </label>
               <Input
-                m={1}
+                autoComplete="username"
+                id="bsky-handle"
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 placeholder="tuvieja.bsky.social"
               />
+              <label className="form-label" htmlFor="bsky-password">
+                App password
+              </label>
               <PasswordInput
+                autoComplete="current-password"
+                id="bsky-password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </VStack>
+              {loginError ? (
+                <Text className="login-error" role="alert">
+                  {loginError}
+                </Text>
+              ) : null}
+            </Stack>
           </DialogBody>
-          <DialogFooter>
+          <DialogFooter className="dialog-footer">
             <Button
-              onClick={() => {
-                loginWithoutsavedCredentials(agent, user, password);
-                setIsLoginOpen(false);
-              }}
-              variant="outline"
+              colorPalette="blue"
+              disabled={!canSubmit}
+              loading={isSubmitting}
+              loadingText="Logging in"
+              type="submit"
             >
               Login
             </Button>
-            <DialogActionTrigger asChild>
-              <Button onClick={() => setIsLoginOpen(false)} variant="outline">
-                Cancel
-              </Button>
-            </DialogActionTrigger>
+            <Button
+              onClick={() => setIsLoginOpen(false)}
+              type="button"
+              variant="outline"
+            >
+              Cancel
+            </Button>
           </DialogFooter>
-          <DialogCloseTrigger />
-        </DialogContent>
-      </DialogRoot>
-    </>
+        </form>
+        <DialogCloseTrigger />
+      </DialogContent>
+    </DialogRoot>
   );
 };

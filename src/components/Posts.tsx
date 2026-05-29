@@ -1,30 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import { BskyAgent } from '@atproto/api';
-import {
-  DialogActionTrigger,
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Context } from './Context';
-import { useContext } from 'react';
-
-import { PasswordInput } from '@/components/ui/password-input';
-import { Tag } from '@/components/ui/tag';
-import { Textarea } from '@chakra-ui/react';
-import { getPostOnLocalStorage } from '@/logic/localstorage';
-import { postingToBsky, savePost, editDraft, deleteDraft } from '@/logic/post';
-import { login } from '@/logic/login';
+import { Text } from '@chakra-ui/react';
+import { postingToBsky, editDraft, deleteDraft } from '@/logic/post';
 import Post from './Post';
 
 const Posts = ({ postsState, setPostsState }) => {
@@ -33,11 +10,44 @@ const Posts = ({ postsState, setPostsState }) => {
   const setIsDraftPostOpen = (isDraftPostOpen) =>
     setPostsState({ isDraftPostOpen });
 
+  const draftIndexes = Object.keys(postsState.posts)
+    .filter((index) => !Number.isNaN(Number(index)))
+    .sort((a, b) => Number(b) - Number(a));
+
+  if (draftIndexes.length === 0) {
+    return (
+      <Text className="empty-state" color="fg.muted">
+        No saved drafts yet.
+      </Text>
+    );
+  }
+
   return (
-    <>
-      {Object.keys(postsState.posts).map((index) => {
-        const handlePostToBluesky = () => {
-          postingToBsky(postsState.agent, postsState.posts, index, setPosts);
+    <section className="posts-grid" aria-label="Saved drafts">
+      {draftIndexes.map((index) => {
+        const handlePostToBluesky = async () => {
+          if (!postsState.isLoggedIn) {
+            setPostsState({
+              isLoginOpen: true,
+              loginError: 'Log in to post this draft to Bluesky.',
+            });
+            return;
+          }
+
+          try {
+            await postingToBsky(
+              postsState.agent,
+              postsState.posts,
+              index,
+              setPosts
+            );
+          } catch {
+            setPostsState({
+              isLoginOpen: true,
+              isLoggedIn: false,
+              loginError: 'Could not post. Please sign in again.',
+            });
+          }
         };
 
         const handleEditDraft = () => {
@@ -46,18 +56,17 @@ const Posts = ({ postsState, setPostsState }) => {
         const handleDeleteDraft = () => {
           deleteDraft(index, postsState.posts, setPosts);
         };
-        return !isNaN(index) ? (
-          <Stack key={index}>
-            <Post
-              text={postsState.posts[index]?.text}
-              postToBluesky={handlePostToBluesky}
-              editDraft={handleEditDraft}
-              deleteDraft={handleDeleteDraft}
-            />
-          </Stack>
-        ) : null;
+        return (
+          <Post
+            key={index}
+            text={postsState.posts[index]?.text}
+            postToBluesky={handlePostToBluesky}
+            editDraft={handleEditDraft}
+            deleteDraft={handleDeleteDraft}
+          />
+        );
       })}
-    </>
+    </section>
   );
 };
 

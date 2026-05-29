@@ -1,31 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import { BskyAgent } from '@atproto/api';
 import Posts from '@/components/Posts';
-import {
-  DialogActionTrigger,
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-
-import { PasswordInput } from '@/components/ui/password-input';
-import { Tag } from '@/components/ui/tag';
-import { Textarea } from '@chakra-ui/react';
 import { getPostOnLocalStorage } from '@/logic/localstorage';
-import { login } from '@/logic/login';
-import { LoginModal } from '@/components/modals/LoginModal';
-import { EditPostModal } from '@/components/modals/EditPostModal';
+import { createBskyAgent, restoreSavedSession } from '@/logic/login';
 import { Header } from '@/components/header/Header';
 import UseStateReducer from '@/hooks/UseStateReducer';
 
@@ -37,66 +15,72 @@ const LOREM_IPSUM = {
 };
 
 const App = () => {
-  const savedPosts = getPostOnLocalStorage();
-  const initialPosts = { ...LOREM_IPSUM, ...savedPosts };
+  const agent = useMemo(() => createBskyAgent(), []);
+  const initialPosts = useMemo(() => {
+    const savedPosts = getPostOnLocalStorage();
+    return { ...LOREM_IPSUM, ...savedPosts };
+  }, []);
 
-  let [postsState, setPostsState] = UseStateReducer({
+  const [postsState, setPostsState] = UseStateReducer({
     isLoginOpen: false,
     isDraftPostOpen: false,
+    isAuthLoading: true,
+    isLoggedIn: false,
+    loginError: '',
     posts: initialPosts,
-    draftText: '',
     user: '',
-    password: '',
     postIndex: 0,
-    agent: new BskyAgent({ service: 'https://bsky.social' }),
+    agent,
   });
 
   useEffect(() => {
-    async function getCredentials() {
-      if ('credentials' in navigator) {
-        const credentials = await navigator.credentials.get({ password: true });
-        if (credentials) {
-          setPostsState({ user: credentials.name });
-          setPostsState({ password: credentials.password });
-          await login(
-            postsState.agent,
-            credentials.name,
-            credentials.password,
-            (isLoginOpen) => {
-              setPostsState({ isLoginOpen });
-            }
-          );
-        } else {
-          setPostsState({ isLoginOpen: true });
-        }
+    let isMounted = true;
+
+    async function restoreLogin() {
+      const result = await restoreSavedSession(agent);
+
+      if (!isMounted) {
+        return;
       }
+
+      setPostsState({
+        isAuthLoading: false,
+        isLoggedIn: result.restored,
+        isLoginOpen: !result.restored,
+        loginError: result.error || '',
+        user: result.user,
+      });
     }
-    getCredentials();
-  }, []);
+
+    restoreLogin();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [agent, setPostsState]);
 
   return (
-    <>
-      <Stack align="flex-start">
-        <Header postsState={postsState} setPostsState={setPostsState} />
-      </Stack>
-      <Button
-        colorPalette="blue"
-        variant="subtle"
-        borderColor="black"
-        m={2}
-        onClick={() => {
-          setPostsState({ postIndex: 0 });
-          setPostsState({ draftText: '' });
-          setPostsState({ isDraftPostOpen: true });
-        }}
-        size="sm"
-      >
-        New Draft Post!
-      </Button>
-      <Stack>
+    <div className="app-shell">
+      <Header postsState={postsState} setPostsState={setPostsState} />
+      <main className="app-main">
+        <div className="draft-toolbar">
+          <Button
+            className="draft-toolbar__button"
+            colorPalette="blue"
+            onClick={() => {
+              setPostsState({
+                postIndex: 0,
+                isDraftPostOpen: true,
+              });
+            }}
+            size="sm"
+          >
+            New Draft!
+          </Button>
+        </div>
         <Posts postsState={postsState} setPostsState={setPostsState} />
-      </Stack>
-    </>
+      </main>
+    </div>
   );
 };
 
