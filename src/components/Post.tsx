@@ -1,48 +1,43 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, Heading, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Input } from '@chakra-ui/react';
-import { BskyAgent } from '@atproto/api';
-import {
-  DialogActionTrigger,
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { PasswordInput } from '@/components/ui/password-input';
-import { Tag } from '@/components/ui/tag';
-import { Textarea } from '@chakra-ui/react';
+import { Card, Heading } from '@chakra-ui/react';
 
 const Post = ({ text, postToBluesky, editDraft, deleteDraft }) => {
   return (
-    <>
-      <Card.Root size="sm">
-        <Card.Header>
-          <Heading size="md"> Saved Post</Heading>
+    <Card.Root className="post-card" size="sm">
+      <div className="post-card__content">
+        <Card.Header className="post-card__header">
+          <Heading className="post-card__title" size="sm">
+            Saved Draft
+          </Heading>
         </Card.Header>
-        <Card.Body color="fg.muted">{text}</Card.Body>
-        <Stack direction="row">
-          <HStack>
-            <Button m={1} variant="outline" onClick={postToBluesky}>
-              Post
-            </Button>
-            <Button onClick={editDraft} padding="20px" variant="outline">
-              Edit
-            </Button>
-            <Button onClick={deleteDraft} padding="20px" variant="outline">
-              Delete
-            </Button>
-          </HStack>
-        </Stack>
-      </Card.Root>
-    </>
+        <Card.Body className="post-card__body" color="fg.muted">
+          {text}
+        </Card.Body>
+        <div className="post-card__actions">
+          <Button colorPalette="blue" onClick={postToBluesky} type="button">
+            Post
+          </Button>
+          <Button
+            colorPalette="blue"
+            onClick={editDraft}
+            type="button"
+            variant="subtle"
+          >
+            Edit
+          </Button>
+          <Button
+            colorPalette="blue"
+            onClick={deleteDraft}
+            type="button"
+            variant="subtle"
+          >
+            Delete
+          </Button>
+        </div>
+      </div>
+    </Card.Root>
   );
 };
 
