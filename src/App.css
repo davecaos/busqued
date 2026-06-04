@@ -347,12 +347,21 @@
   justify-content: flex-end;
 }
 
-@media (max-width: 640px) {
+/* Full-bleed: span the whole screen edge-to-edge on phones & tablets. */
+@media (max-width: 768px) {
   .app-header,
   .app-main {
+    border-width: 0;
     width: 100%;
   }
 
+  .draft-toolbar {
+    right: 1rem;
+    width: min(calc((100vw - 2rem) / 3), 12rem);
+  }
+}
+
+@media (max-width: 640px) {
   .app-header {
     padding: 0.75rem 0.85rem;
   }
