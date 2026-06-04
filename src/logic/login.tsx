@@ -22,6 +22,33 @@ const getSessionUser = (session?: Partial<AtpSessionData> | null) => {
   return session?.handle || session?.did || '';
 };
 
+export type BskyProfile = {
+  displayName: string;
+  handle: string;
+  avatar?: string;
+};
+
+// Resilient profile lookup: returns null on any failure so the UI never blocks.
+export const fetchProfile = async (
+  agent: BskyAgent,
+  actor: string
+): Promise<BskyProfile | null> => {
+  if (!actor) {
+    return null;
+  }
+
+  try {
+    const { data } = await agent.getProfile({ actor });
+    return {
+      displayName: data.displayName || data.handle,
+      handle: data.handle,
+      avatar: data.avatar,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const createBskyAgent = () => {
   return new BskyAgent({
     service: BSKY_SERVICE,

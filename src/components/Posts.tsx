@@ -60,9 +60,13 @@ const Posts = ({ postsState, setPostsState }) => {
           <Post
             key={index}
             text={postsState.posts[index]?.text}
+            createdAt={postsState.posts[index]?.createdAt}
             postToBluesky={handlePostToBluesky}
             editDraft={handleEditDraft}
             deleteDraft={handleDeleteDraft}
+            authorAvatar={postsState.profile?.avatar}
+            authorDisplayName={postsState.profile?.displayName}
+            authorHandle={postsState.profile?.handle || postsState.user}
           />
         );
       })}

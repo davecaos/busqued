@@ -3,7 +3,12 @@ import { useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import Posts from '@/components/Posts';
 import { getPostOnLocalStorage } from '@/logic/localstorage';
-import { createBskyAgent, restoreSavedSession } from '@/logic/login';
+import {
+  createBskyAgent,
+  fetchProfile,
+  restoreSavedSession,
+  type BskyProfile,
+} from '@/logic/login';
 import { Header } from '@/components/header/Header';
 import UseStateReducer from '@/hooks/UseStateReducer';
 
@@ -30,6 +35,7 @@ const App = () => {
     posts: initialPosts,
     user: '',
     postIndex: 0,
+    profile: null as BskyProfile | null,
     agent,
   });
 
@@ -50,6 +56,14 @@ const App = () => {
         loginError: result.error || '',
         user: result.user,
       });
+
+      if (result.restored && result.user) {
+        fetchProfile(agent, result.user).then((profile) => {
+          if (isMounted) {
+            setPostsState({ profile });
+          }
+        });
+      }
     }
 
     restoreLogin();

@@ -3,17 +3,27 @@
   width: 100%;
 }
 
-.app-shell {
+/* Design tokens live on :root so they reach portaled content (dialogs) too. */
+:root {
   --bsky-blue: #1083fe;
   --bsky-blue-dark: #0062c8;
   --bsky-blue-soft: #e8f3ff;
   --bsky-border: #d5e3f0;
   --bsky-text: #0f1419;
   --bsky-muted: #536471;
+  --bsky-error: #b42318;
+  --bsky-bg: #f4f9ff;
+  --bsky-bg-tint: rgba(16, 131, 254, 0.12);
+  --bsky-header-bg: rgba(255, 255, 255, 0.9);
+  --bsky-surface: #ffffff;
+  --bsky-surface-hover: #f8fbff;
+}
+
+.app-shell {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(16, 131, 254, 0.12), transparent 15rem),
-    #f4f9ff;
+    linear-gradient(180deg, var(--bsky-bg-tint), transparent 15rem),
+    var(--bsky-bg);
   color: var(--bsky-text);
 }
 
@@ -24,7 +34,7 @@
 }
 
 .app-header {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bsky-header-bg);
   border-color: var(--bsky-border);
   border-style: solid;
   border-width: 0 1px;
@@ -49,20 +59,38 @@
 }
 
 .app-header__actions {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: fit-content;
+}
+
+.app-header__actions-row {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: flex-end;
-  min-width: fit-content;
 }
 
 .app-header__actions [data-scope='tag'] {
   border-radius: 999px;
 }
 
+.app-header__user {
+  color: var(--bsky-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  max-width: 16ch;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .app-main {
-  background: #ffffff;
+  background: var(--bsky-surface);
   border-color: var(--bsky-border);
   border-style: solid;
   border-width: 0 1px;
@@ -111,14 +139,15 @@
 }
 
 .post-card {
-  background: #ffffff;
+  background: var(--bsky-surface);
   border-color: var(--bsky-border);
+  border-style: solid;
   border-radius: 0;
   border-width: 0 0 1px;
   box-shadow: none;
   height: auto;
   min-width: 0;
-  padding: 0.95rem 1rem 0.75rem;
+  padding: 0.85rem 1rem 0.6rem;
   text-align: left;
   transition:
     background-color 160ms ease,
@@ -126,41 +155,91 @@
 }
 
 .post-card:hover {
-  background: #f8fbff;
+  background: var(--bsky-surface-hover);
+}
+
+.post-card__layout {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.post-card__avatar-col {
+  flex-shrink: 0;
+  padding-top: 0.15rem;
+}
+
+.post-card__avatar {
+  border-radius: 50%;
+  height: 2.5rem;
+  overflow: hidden;
+  width: 2.5rem;
 }
 
 .post-card__content {
+  flex: 1;
   min-width: 0;
 }
 
-.post-card__header {
-  padding: 0;
+.post-card__identity {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  line-height: 1.3;
+  margin-bottom: 0.15rem;
 }
 
-.post-card__title {
+.post-card__display-name {
   color: var(--bsky-text);
-  line-height: 1.3;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-card__handle,
+.post-card__timestamp {
+  color: var(--bsky-muted);
+  font-size: 0.875rem;
+}
+
+.post-card__timestamp::before {
+  content: '·';
+  margin-right: 0.3rem;
 }
 
 .post-card__body {
   color: var(--bsky-text);
   font-size: 0.98rem;
   line-height: 1.45;
+  margin: 0;
   overflow-wrap: anywhere;
-  padding: 0.25rem 0 0.75rem;
+  padding: 0 0 0.4rem;
   white-space: pre-wrap;
 }
 
 .post-card__actions {
+  align-items: center;
   display: flex;
-  flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: flex-end;
+  margin-top: 0.1rem;
   padding: 0;
 }
 
-.post-card__actions > button {
-  min-width: 5rem;
+.post-card__draft-actions {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.post-card__action-icon {
+  opacity: 0.6;
+  transition: opacity 160ms ease;
+}
+
+.post-card__action-icon:hover {
+  opacity: 1;
 }
 
 .login-dialog,
@@ -176,8 +255,74 @@
 }
 
 .login-error {
-  color: #b42318;
+  color: var(--bsky-error);
   font-size: 0.875rem;
+}
+
+.app-header__brand {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.app-header__logo {
+  flex-shrink: 0;
+}
+
+.app-header__heading {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.app-header__subtitle {
+  font-size: 0.8rem;
+  margin-left: calc(26px + 0.5rem);
+}
+
+.draft-composer {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.draft-composer__avatar-col {
+  flex-shrink: 0;
+  padding-top: 0.2rem;
+}
+
+.draft-composer__avatar {
+  border-radius: 50%;
+  height: 2.5rem;
+  overflow: hidden;
+  width: 2.5rem;
+}
+
+.draft-composer__textarea-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.draft-composer__textarea {
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 1.0625rem !important;
+  outline: none !important;
+  padding: 0.25rem 0 !important;
+  resize: none;
+}
+
+.char-ring {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.char-ring__label {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 1.5ch;
+  text-align: right;
 }
 
 .login-dialog,
@@ -216,7 +361,7 @@
     align-items: flex-start;
   }
 
-.app-header__actions,
+  .app-header__actions,
   .dialog-actions {
     justify-content: stretch;
   }
@@ -235,18 +380,38 @@
     padding: 0.85rem;
   }
 
-  .post-card__actions {
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-  }
-
-  .post-card__actions > button {
-    flex: 1 1 0;
-    min-width: 0;
-    width: auto;
-  }
-
   .draft-dialog__footer {
     align-items: stretch;
   }
+}
+
+/* === Dark mode — next-themes adds class="dark" to <html> ===
+   Overrides on html.dark (not .app-shell) so tokens also apply inside
+   portaled dialogs, which render outside the .app-shell subtree. */
+html.dark {
+  --bsky-blue: #208bfe;
+  --bsky-blue-dark: #1472e4;
+  --bsky-blue-soft: #1a2a40;
+  --bsky-border: #2a3947;
+  --bsky-text: #f1f3f5;
+  --bsky-muted: #8a96a3;
+  --bsky-error: #f87171;
+  --bsky-bg: #161e27;
+  --bsky-bg-tint: rgba(32, 139, 254, 0.08);
+  --bsky-header-bg: rgba(22, 30, 39, 0.92);
+  --bsky-surface: #1e2936;
+  --bsky-surface-hover: #243344;
+}
+
+html.dark body {
+  background: #161e27;
+}
+
+/* Solid, readable dialog surface in dark mode (portaled outside .app-shell). */
+html.dark .draft-dialog,
+html.dark .login-dialog {
+  background: var(--bsky-surface);
+  border: 2px solid #5f7488;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: var(--bsky-text);
 }

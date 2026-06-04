@@ -37,10 +37,14 @@ export const savePost = async (
   setPosts,
   setIsDraftPostOpen
 ) => {
+  const existing = posts[Number(index)];
   const nextPosts = {
     ...posts,
     last_index: Math.max(Number(index), Number(posts.last_index || 0)),
-    [Number(index)]: { text: draftText.trim() },
+    [Number(index)]: {
+      text: draftText.trim(),
+      createdAt: existing?.createdAt || new Date().toISOString(),
+    },
   };
 
   setPosts(nextPosts);

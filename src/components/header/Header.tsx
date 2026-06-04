@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { LoginModal } from '@/components/modals/LoginModal';
 import { EditPostModal } from '@/components/modals/EditPostModal';
 import { Tag } from '@/components/ui/tag';
-import { clearSavedSession, createBskyAgent } from '@/logic/login';
+import { BlueskyLogo } from '@/components/ui/BlueskyLogo';
+import { ColorModeButton } from '@/components/ui/color-mode';
+import {
+  clearSavedSession,
+  createBskyAgent,
+  fetchProfile,
+} from '@/logic/login';
 
 export const Header = ({ postsState, setPostsState }) => {
   const setIsLoginOpen = (isLoginOpen) => setPostsState({ isLoginOpen });
@@ -22,6 +28,7 @@ export const Header = ({ postsState, setPostsState }) => {
       isLoginOpen: true,
       loginError: '',
       user: '',
+      profile: null,
     });
   };
 
@@ -29,30 +36,40 @@ export const Header = ({ postsState, setPostsState }) => {
     <header className="app-header">
       <div className="app-header__bar">
         <div className="app-header__title">
-          <Heading as="h1" size="xl">
-            Busqued
-          </Heading>
-          <Text color="fg.muted">Drafts app for Bluesky social</Text>
+          <div className="app-header__brand">
+            <BlueskyLogo size={26} className="app-header__logo" />
+            <Heading as="h1" size="lg" className="app-header__heading">
+              Busqued
+            </Heading>
+          </div>
+          <Text color="fg.muted" className="app-header__subtitle">
+            Drafts app for Bluesky social
+          </Text>
         </div>
         <div className="app-header__actions">
-          {postsState.isAuthLoading ? (
-            <Tag colorPalette="blue">Checking session</Tag>
-          ) : postsState.isLoggedIn ? (
-            <>
-              <Tag colorPalette="green">{postsState.user || 'Logged in'}</Tag>
+          <div className="app-header__actions-row">
+            {postsState.isAuthLoading ? (
+              <Tag colorPalette="blue">Checking session</Tag>
+            ) : postsState.isLoggedIn ? (
               <Button size="sm" variant="outline" onClick={handleLogout}>
                 Log out
               </Button>
-            </>
-          ) : (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPostsState({ isLoginOpen: true })}
-            >
-              Log in
-            </Button>
-          )}
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPostsState({ isLoginOpen: true })}
+              >
+                Log in
+              </Button>
+            )}
+            <ColorModeButton />
+          </div>
+          {postsState.isLoggedIn ? (
+            <span className="app-header__user">
+              {postsState.user || 'Logged in'}
+            </span>
+          ) : null}
         </div>
       </div>
       <LoginModal
@@ -61,14 +78,17 @@ export const Header = ({ postsState, setPostsState }) => {
         agent={postsState.agent}
         loginError={postsState.loginError}
         setLoginError={setLoginError}
-        onLoginSuccess={(user) =>
+        onLoginSuccess={(user) => {
           setPostsState({
             isLoggedIn: true,
             isLoginOpen: false,
             loginError: '',
             user,
-          })
-        }
+          });
+          fetchProfile(postsState.agent, user).then((profile) => {
+            setPostsState({ profile });
+          });
+        }}
       />
       <EditPostModal
         isDraftPostOpen={postsState.isDraftPostOpen}
@@ -76,6 +96,8 @@ export const Header = ({ postsState, setPostsState }) => {
         posts={postsState.posts}
         setPosts={setPosts}
         postIndex={postsState.postIndex}
+        authorAvatar={postsState.profile?.avatar}
+        authorDisplayName={postsState.profile?.displayName}
       />
     </header>
   );
