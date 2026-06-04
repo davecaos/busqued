@@ -1,7 +1,7 @@
-import {
+import type {
   BskyAgent,
-  type AtpSessionData,
-  type AtpSessionEvent,
+  AtpSessionData,
+  AtpSessionEvent,
 } from '@atproto/api';
 import {
   clearBskySessionOnLocalStorage,
@@ -49,7 +49,10 @@ export const fetchProfile = async (
   }
 };
 
-export const createBskyAgent = () => {
+// Loads @atproto/api lazily so the SDK is split into an async chunk
+// instead of bloating the initial bundle.
+export const createBskyAgent = async (): Promise<BskyAgent> => {
+  const { BskyAgent } = await import('@atproto/api');
   return new BskyAgent({
     service: BSKY_SERVICE,
     persistSession: (event: AtpSessionEvent, session?: AtpSessionData) => {

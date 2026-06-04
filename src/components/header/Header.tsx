@@ -20,16 +20,16 @@ export const Header = ({ postsState, setPostsState }) => {
   const setPosts = (posts) => setPostsState({ posts });
   const setLoginError = (loginError) => setPostsState({ loginError });
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     clearSavedSession();
     setPostsState({
-      agent: createBskyAgent(),
       isLoggedIn: false,
       isLoginOpen: true,
       loginError: '',
       user: '',
       profile: null,
     });
+    setPostsState({ agent: await createBskyAgent() });
   };
 
   return (

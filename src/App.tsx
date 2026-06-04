@@ -1,5 +1,6 @@
 import './App.css';
 import { useEffect, useMemo } from 'react';
+import type { BskyAgent } from '@atproto/api';
 import { Button } from '@/components/ui/button';
 import Posts from '@/components/Posts';
 import { getPostOnLocalStorage } from '@/logic/localstorage';
@@ -20,7 +21,6 @@ const LOREM_IPSUM = {
 };
 
 const App = () => {
-  const agent = useMemo(() => createBskyAgent(), []);
   const initialPosts = useMemo(() => {
     const savedPosts = getPostOnLocalStorage();
     return { ...LOREM_IPSUM, ...savedPosts };
@@ -36,13 +36,21 @@ const App = () => {
     user: '',
     postIndex: 0,
     profile: null as BskyProfile | null,
-    agent,
+    agent: null as BskyAgent | null,
   });
 
   useEffect(() => {
     let isMounted = true;
 
     async function restoreLogin() {
+      // Creating the agent lazily loads @atproto/api off the critical
+      // render path, so the draft feed paints before the SDK arrives.
+      const agent = await createBskyAgent();
+
+      if (!isMounted) {
+        return;
+      }
+
       const result = await restoreSavedSession(agent);
 
       if (!isMounted) {
@@ -50,6 +58,7 @@ const App = () => {
       }
 
       setPostsState({
+        agent,
         isAuthLoading: false,
         isLoggedIn: result.restored,
         isLoginOpen: !result.restored,
@@ -71,7 +80,7 @@ const App = () => {
     return () => {
       isMounted = false;
     };
-  }, [agent, setPostsState]);
+  }, [setPostsState]);
 
   return (
     <div className="app-shell">
