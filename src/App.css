@@ -348,7 +348,7 @@
 }
 
 /* Full-bleed: span the whole screen edge-to-edge on phones & tablets. */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .app-header,
   .app-main {
     border-width: 0;
