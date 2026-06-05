@@ -314,15 +314,20 @@
 .char-ring {
   align-items: center;
   display: inline-flex;
-  gap: 0.3rem;
+  justify-content: center;
+  position: relative;
 }
 
 .char-ring__label {
-  font-size: 0.78rem;
+  align-items: center;
+  display: flex;
+  font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  min-width: 1.5ch;
-  text-align: right;
+  inset: 0;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
 }
 
 .login-dialog,

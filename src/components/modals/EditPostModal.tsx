@@ -20,49 +20,52 @@ const NEAR_LIMIT_THRESHOLD = 20;
 const CharRing = ({ value, max }: { value: number; max: number }) => {
   const remaining = max - value;
   const pct = Math.min(value / max, 1);
-  const radius = 10;
+  const radius = 14;
   const circumference = 2 * Math.PI * radius;
   const dashOffset = circumference * (1 - pct);
   const isOver = remaining < 0;
   const isNear = remaining >= 0 && remaining <= NEAR_LIMIT_THRESHOLD;
-  const color = isOver
+  const ringColor = isOver
     ? 'var(--bsky-error)'
     : isNear
       ? '#f59e0b'
       : 'var(--bsky-blue)';
+  const labelColor = isOver
+    ? 'var(--bsky-error)'
+    : isNear
+      ? '#f59e0b'
+      : 'var(--bsky-muted)';
 
   return (
     <span
       className="char-ring"
       aria-label={`${remaining} characters remaining`}
     >
-      <svg width="26" height="26" viewBox="0 0 28 28">
+      <svg width="34" height="34" viewBox="0 0 36 36">
         <circle
-          cx="14"
-          cy="14"
+          cx="18"
+          cy="18"
           r={radius}
           fill="none"
           stroke="var(--bsky-border)"
-          strokeWidth="2.5"
+          strokeWidth="3"
         />
         <circle
-          cx="14"
-          cy="14"
+          cx="18"
+          cy="18"
           r={radius}
           fill="none"
-          stroke={color}
-          strokeWidth="2.5"
+          stroke={ringColor}
+          strokeWidth="3"
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
           strokeLinecap="round"
-          transform="rotate(-90 14 14)"
+          transform="rotate(-90 18 18)"
         />
       </svg>
-      {isNear || isOver ? (
-        <span className="char-ring__label" style={{ color }}>
-          {remaining}
-        </span>
-      ) : null}
+      <span className="char-ring__label" style={{ color: labelColor }}>
+        {remaining}
+      </span>
     </span>
   );
 };
